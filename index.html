@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Semestaku 🌌</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050510;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            touch-action: manipulation;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .font-cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 1s ease-in forwards;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 15px 10px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        /* Click Sparkles */
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: white;
+            border-radius: 50%;
+            animation: sparkleAnim 1s linear forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: scale(0) translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1.5) translateY(-50px) rotate(180deg); opacity: 0; }
+        }
+
+        .fade-in-poem {
+            animation: fadeInPoem 1s ease-in forwards;
+        }
+        @keyframes fadeInPoem {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center relative select-none">
+
+    <div id="canvas-container">
+        <canvas id="universe"></canvas>
+    </div>
+
+    <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center z-10 transition-opacity duration-1000">
+        <h1 class="font-cursive text-5xl md:text-7xl mb-6 text-center text-pink-100 drop-shadow-[0_0_15px_rgba(255,192,203,0.5)] floating">
+            Hai, Semestaku ✨
+        </h1>
+        <p class="text-gray-300 mb-8 text-sm md:text-base tracking-widest uppercase">Ada pesan untukmu</p>
+        <button onclick="startJourney()" class="pulse-glow glass-card px-8 py-3 rounded-full text-white font-medium hover:bg-white/10 transition-all duration-300 flex items-center gap-3 border border-pink-200/30">
+            <i class="fa-solid fa-envelope-open-text"></i> Buka Pesan
+        </button>
+    </div>
+
+    <div id="story-container" class="hidden w-11/12 md:w-2/3 max-w-2xl z-10 flex-col items-center justify-center min-h-[60vh] relative">
+        
+        <!-- Music Player Toggle -->
+        <button onclick="toggleMusic()" class="absolute -top-16 right-0 glass-card p-3 rounded-full text-white hover:text-pink-300 transition-colors z-20 tooltip" title="Putar Lagu">
+            <i class="fa-solid fa-music"></i>
+        </button>
+
+        <!-- Message Card -->
+        <div class="glass-card w-full p-8 md:p-12 rounded-3xl text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent opacity-50"></div>
+            
+            <p id="message-text" class="text-lg md:text-2xl leading-relaxed md:leading-loose text-gray-100 min-h-[150px] flex items-center justify-center">
+                <!-- Text will be injected here -->
+            </p>
+
+            <div class="mt-10 flex justify-between items-center w-full">
+                <span id="progress-indicator" class="text-xs text-gray-400 tracking-widest">1 / 10</span>
+                <button id="next-btn" onclick="nextMessage()" class="glass-card px-6 py-2 rounded-full text-sm hover:bg-white/10 transition-all flex items-center gap-2">
+                    Lanjut <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="poem-container" class="hidden w-11/12 md:w-3/4 max-w-3xl z-10 flex-col items-center justify-center min-h-[70vh] relative text-center">
+        <h2 class="font-cursive text-4xl md:text-5xl text-pink-300 mb-8 drop-shadow-[0_0_10px_rgba(255,192,203,0.5)]">Untuk Semestaku yang Sedang Mendung</h2>
+        
+        <div class="glass-card w-full p-6 md:p-10 rounded-3xl space-y-8 text-base md:text-xl text-gray-100 leading-relaxed font-medium">
+            <p class="fade-in-poem italic" style="animation-delay: 0.5s; opacity: 0;">
+                Beli blewah ke pasar baru,<br>
+                Pulangnya mampir beli pepaya.<br>
+                Meskipun Sapi lagi kelabu,<br>
+                Cantiknya tetep bersinar, ya! 😜
+            </p>
+            
+            <p class="fade-in-poem" style="animation-delay: 4s; opacity: 0;">
+                Wahai Semestaku yang indah...<br>
+                Bintang di langit pun tahu kalau kamu sedang lelah,<br>
+                Bulan pun ikut meredup saat senyummu pasrah.
+            </p>
+            
+            <p class="fade-in-poem" style="animation-delay: 8s; opacity: 0;">
+                Tapi ingatlah, badai pasti berlalu,<br>
+                Seperti pagi yang selalu setia menunggu.<br>
+                Tarik napas dalam-dalam, buang semua ragu,<br>
+                Kaza selalu ada, siap menjaga dan memelukmu.
+            </p>
+            
+            <p class="fade-in-poem font-bold text-pink-200" style="animation-delay: 12s; opacity: 0;">
+                Semangat terus, Shafira.<br>
+                Jangan lupa tersenyum hari ini,<br>
+                Karena besok adalah hari bahagiamu. 🎂✨<br>
+                <span class="text-sm font-normal text-gray-400 mt-2 block">Aku mengagumimu, selalu. - Kaza</span>
+            </p>
+        </div>
+        
+        <button onclick="createConfetti()" class="mt-8 pulse-glow glass-card px-8 py-3 rounded-full text-white font-semibold hover:bg-white/10 transition-all duration-300 fade-in-poem flex items-center gap-2 border border-pink-300/50" style="animation-delay: 15s; opacity: 0;">
+            <i class="fa-solid fa-gift text-pink-300"></i> Semangat untuk Besok!
+        </button>
+    </div>
+
+    <div id="spotify-container" class="hidden fixed bottom-5 left-1/2 transform -translate-x-1/2 w-11/12 max-w-md z-30 transition-transform duration-500 translate-y-full">
+        <div class="relative">
+            <button onclick="toggleMusic()" class="absolute -top-10 right-2 bg-gray-800 text-white rounded-full p-2 w-8 h-8 flex items-center justify-center hover:bg-gray-700">
+                <i class="fa-solid fa-times"></i>
+            </button>
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/3LhUsgwtftfxHIPgViaYxB?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Pesan dari Kaza untuk Sapi
+        const messages = [
+            "Halo Shafira Mustika Harda Saputri... 🤍<br><br><span class='text-sm text-gray-300'>Selamat pagi, siang, sore, atau malam. Aku harap kamu seneng ya baca pesan dari Kaza ini.</span>",
+            
+            "Kaza tahu kamu lagi pengen sendiri, dan jujur Kaza takut banget ganggu waktu tenang kamu. Kaza sempet bingung harus ngapain...",
+            
+            "Tapi di sisi lain, Kaza kepikiran dan khawatir banget sama kamu. Rasanya nggak tenang kalau tahu semestaku lagi mendung.",
+            
+            "Kaza cuma mau ingetin... Apapun yang lagi Sapi hadapi sekarang, entah itu masalah pribadi, rasa capek, atau hal nyebelin lainnya...",
+            
+            "Tolong ingat kalau <span class='font-cursive text-4xl text-pink-200 mt-2 block drop-shadow-md'>Kaza selalu ada di sini.</span>",
+            
+            "Kaza siap jadi pendengar yang baik kalau kamu mau cerita, atau sekadar nemenin kamu dalam diam kalau kamu cuma butuh kehadiran.",
+            
+            "Kaza harap, apapun yang Sapi rasain sekarang, jangan dipendam sendirian terus ya? Jangan biarin hal itu bikin cantikku ini sedih seharian.",
+            
+            "Jujur, Kaza sedih tiap tahu Sapi lagi nggak baik-baik aja. Pengen banget rasanya sulap semua masalah kamu biar hilang saat itu juga. ✨",
+            
+            "Tapi karena Kaza bukan penyihir, Kaza cuma bisa ngirim semangat super gede dari sini! 🔥 Ayo dong, Semestaku pasti kuat!",
+            
+            "Tolong tetap jaga kesehatan ya sayang. Jangan sampai telat makan, yang banyak minum air putihnya, dan istirahat yang cukup.",
+            
+            "Lakuin hal-hal yang bikin kamu nyaman. Nonton, dengerin lagu, atau sekadar rebahan santai. Nggak apa-apa kok istirahat sebentar, kamu berhak dapetin itu.",
+            
+            "Kaza harap Sapi nggak terlalu stres dan stop overthinking hal-hal yang belum tentu terjadi ya. Pelan-pelan aja, kita hadapi satu-satu.",
+            
+            "Lagian... coba deh lihat kalender hari ini.<br><span class='text-5xl font-bold text-white mt-6 block floating'>Ini udah tanggal 30 loh!</span>",
+            
+            "Masa besok mau ulang tahun, tapi hari terakhir di umur sekarang dihabisin buat bersedih sih? Sayang banget tauuu.",
+            
+            "Ayo dong senyum dikiiit aja buat Kaza! 😁 Semangat ya cantikku, besok bakal dapet hadiah loh! 🎁✨",
+            
+            "Semoga setelah baca ini perasaanmu jadi lebih baik ya. Ingat, kalau butuh apapun, Kaza pasti usahain. Apapun itu.",
+            
+            "Sebagai penutup dari Kaza yang lagi kangen Sapi, Kaza punya sesuatu. Dibuka ya! <br><i class='fa-solid fa-arrow-down text-pink-300 mt-4 text-2xl bounce'></i>"
+        ];
+
+        let currentIndex = 0;
+        const msgElement = document.getElementById('message-text');
+        const progressElement = document.getElementById('progress-indicator');
+        const nextBtn = document.getElementById('next-btn');
+        let musicVisible = false;
+
+        function startJourney() {
+            document.getElementById('welcome-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('welcome-screen').classList.add('hidden');
+                document.getElementById('story-container').classList.remove('hidden');
+                document.getElementById('story-container').classList.add('flex', 'fade-in');
+                showMessage();
+                
+                // Show spotify after a few seconds gently
+                setTimeout(() => {
+                    toggleMusic();
+                }, 3000);
+            }, 1000);
+        }
+
+        function showMessage() {
+            msgElement.classList.remove('fade-in');
+            msgElement.classList.add('fade-out');
+            
+            setTimeout(() => {
+                msgElement.innerHTML = messages[currentIndex];
+                progressElement.innerText = `${currentIndex + 1} / ${messages.length}`;
+                
+                msgElement.classList.remove('fade-out');
+                msgElement.classList.add('fade-in');
+
+                if (currentIndex === messages.length - 1) {
+                    nextBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text text-pink-400"></i> Buka Puisi Spesial';
+                    nextBtn.onclick = transitionToPoem; 
+                }
+            }, 500);
+        }
+
+        function transitionToPoem() {
+            const storyContainer = document.getElementById('story-container');
+            storyContainer.classList.remove('fade-in');
+            storyContainer.classList.add('fade-out');
+            
+            setTimeout(() => {
+                storyContainer.classList.add('hidden');
+                storyContainer.classList.remove('flex');
+                
+                const poemContainer = document.getElementById('poem-container');
+                poemContainer.classList.remove('hidden');
+                poemContainer.classList.add('flex', 'fade-in');
+            }, 500);
+        }
+
+        function nextMessage() {
+            if (currentIndex < messages.length - 1) {
+                currentIndex++;
+                showMessage();
+            }
+        }
+
+        function toggleMusic() {
+            const spotifyContainer = document.getElementById('spotify-container');
+            if (musicVisible) {
+                spotifyContainer.classList.remove('translate-y-0');
+                spotifyContainer.classList.add('translate-y-full');
+            } else {
+                spotifyContainer.classList.remove('hidden');
+                // Small delay to allow display:block to apply before transition
+                setTimeout(() => {
+                    spotifyContainer.classList.remove('translate-y-full');
+                    spotifyContainer.classList.add('translate-y-0');
+                }, 50);
+            }
+            musicVisible = !musicVisible;
+        }
+
+        const canvas = document.getElementById('universe');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [];
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            initStars();
+        }
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random();
+                this.fadeDir = Math.random() > 0.5 ? 1 : -1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+
+                this.opacity += 0.01 * this.fadeDir;
+                if (this.opacity >= 1) {
+                    this.opacity = 1;
+                    this.fadeDir = -1;
+                } else if (this.opacity <= 0.1) {
+                    this.opacity = 0.1;
+                    this.fadeDir = 1;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((width * height) / 3000); // Responsive amount of stars
+            for (let i = 0; i < numStars; i++) {
+                stars.push(new Star());
+            }
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw subtle background gradient
+            const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+            gradient.addColorStop(0, '#0a0a2a');
+            gradient.addColorStop(1, '#020205');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateStars();
+
+        // Add sparkles on click anywhere
+        document.addEventListener('click', function(e) {
+            // Don't add sparkles if clicking buttons or iframe
+            if(e.target.closest('button') || e.target.closest('iframe')) return;
+
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = e.clientX + 'px';
+            sparkle.style.top = e.clientY + 'px';
+            sparkle.style.width = (Math.random() * 10 + 5) + 'px';
+            sparkle.style.height = sparkle.style.width;
+            
+            // Random color for sparkles
+            const colors = ['#fff', '#ffc0cb', '#87ceeb', '#dda0dd'];
+            sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            document.body.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), 1000);
+        });
+
+        // Simple Confetti for the last slide
+        function createConfetti() {
+            const colors = ['#ff69b4', '#ff1493', '#ffc0cb', '#ffffff', '#ffd700'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.zIndex = '50';
+                    confetti.style.pointerEvents = 'none';
+                    
+                    const duration = Math.random() * 3 + 2;
+                    confetti.style.transition = `transform ${duration}s linear, top ${duration}s linear, opacity ${duration}s ease-in`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Trigger reflow
+                    confetti.offsetHeight;
+                    
+                    confetti.style.top = '100vh';
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg) translateX(${Math.random() * 100 - 50}px)`;
+                    confetti.style.opacity = '0';
+                    
+                    setTimeout(() => confetti.remove(), duration * 1000);
+                }, i * 20);
+            }
+        }
+    </script>
+</body>
+</html>
